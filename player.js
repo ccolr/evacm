@@ -5,7 +5,7 @@ const player = videojs(
   {
     autoplay: false,
     controls: true,
-    fluid: true,
+    fluid: false,
     inactivityTimeout: 2200,
     enableSmoothSeeking: true,
     disableSeekWhileScrubbingOnMobile: true,
@@ -33,6 +33,16 @@ const player = videojs(
 const playerWrap = document.querySelector("#playerWrap");
 const pageShell = document.querySelector(".page-shell");
 const peekToggle = document.querySelector("#peekToggle");
+
+function updatePlayerAspectRatio() {
+  const mediaElement = player.el().querySelector("video");
+  if (!mediaElement?.videoWidth || !mediaElement.videoHeight) return;
+
+  playerWrap.style.setProperty(
+    "--video-aspect-ratio",
+    `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`,
+  );
+}
 
 function enforceNormalPlaybackRate() {
   const mediaElement = player.el().querySelector("video");
@@ -233,7 +243,10 @@ window.addEventListener("resize", () => {
   resizeFrame = requestAnimationFrame(updatePeekOffset);
 });
 
-player.on("loadedmetadata", enforceNormalPlaybackRate);
+player.on("loadedmetadata", () => {
+  enforceNormalPlaybackRate();
+  updatePlayerAspectRatio();
+});
 player.on("ratechange", enforceNormalPlaybackRate);
 player.on("play", () => {
   enforceNormalPlaybackRate();

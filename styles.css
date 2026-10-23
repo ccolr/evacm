@@ -126,8 +126,9 @@ h1 {
 }
 
 .player {
+  --video-aspect-ratio: 16 / 9;
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--video-aspect-ratio);
   overflow: hidden;
   border-radius: 1px;
   background: #080808;
@@ -139,6 +140,11 @@ h1 {
   color: #fff;
   background: #080808;
   font-family: Arial, sans-serif;
+}
+
+.video-js .vjs-tech {
+  object-fit: contain;
+  object-position: center;
 }
 
 .video-js .vjs-poster { background-size: contain; }
