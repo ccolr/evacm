@@ -15,11 +15,11 @@
 <body>
     <div class="background" aria-hidden="true"></div>
 
-    <main class="page-shell">
+    <main class="page-shell is-metadata-pending" aria-busy="true">
         <header class="page-header">
             <h1>星之声 / ほしのこえ</h1>
-            <button class="peek-toggle" id="peekToggle" type="button" aria-pressed="false"
-                aria-label="下移卡片以查看背景" title="查看背景">
+            <button class="peek-toggle" id="peekToggle" type="button" aria-pressed="false" aria-label="下移卡片以查看背景"
+                title="查看背景">
                 <svg class="peek-toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M8 1 4.25 4.75h2.5v6.5h-2.5L8 15l3.75-3.75h-2.5v-6.5h2.5L8 1Z" />
                 </svg>
@@ -29,8 +29,8 @@
         <section class="player-card" aria-label="视频播放器">
             <div class="player" id="playerWrap">
                 <video id="video" class="video-js vjs-big-play-centered" controls preload="metadata" playsinline
-                    poster="./poster.jpg">
-                    <source src="./video.mp4" type="video/mp4" />
+                    poster="./cover.png">
+                    <source src="./cat.mp4" type="video/mp4" />
                     你的浏览器暂不支持 HTML5 视频播放。
                 </video>
                 <div class="video-heading" aria-hidden="true">

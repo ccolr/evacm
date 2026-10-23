@@ -47,6 +47,8 @@ body {
   will-change: transform;
 }
 
+.page-shell.is-metadata-pending { visibility: hidden; }
+
 .page-shell.is-peeking { transform: translateY(var(--peek-offset)); }
 
 .page-header {

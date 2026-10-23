@@ -25,6 +25,7 @@ const player = videojs(
   },
   () => {
     enforceNormalPlaybackRate();
+    updatePlayerAspectRatio();
     // 明确保持初始暂停，避免浏览器扩展恢复上次播放。
     player.pause();
   },
@@ -34,6 +35,11 @@ const playerWrap = document.querySelector("#playerWrap");
 const pageShell = document.querySelector(".page-shell");
 const peekToggle = document.querySelector("#peekToggle");
 
+function showPageShell() {
+  pageShell.classList.remove("is-metadata-pending");
+  pageShell.removeAttribute("aria-busy");
+}
+
 function updatePlayerAspectRatio() {
   const mediaElement = player.el().querySelector("video");
   if (!mediaElement?.videoWidth || !mediaElement.videoHeight) return;
@@ -42,6 +48,7 @@ function updatePlayerAspectRatio() {
     "--video-aspect-ratio",
     `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`,
   );
+  showPageShell();
 }
 
 function enforceNormalPlaybackRate() {
@@ -247,6 +254,7 @@ player.on("loadedmetadata", () => {
   enforceNormalPlaybackRate();
   updatePlayerAspectRatio();
 });
+player.on("error", showPageShell);
 player.on("ratechange", enforceNormalPlaybackRate);
 player.on("play", () => {
   enforceNormalPlaybackRate();
