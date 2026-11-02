@@ -7,14 +7,14 @@ const pageByHostname = Object.freeze({
 const localHostnames = new Set(["127.0.0.1", "localhost"]);
 const sites = Object.freeze([
   {
-    key: "cat",
-    label: "猫の恩返し · The Cat Returns",
-    url: "https://cat.eva.cm/",
-  },
-  {
     key: "shelter",
     label: "避难所 · Shelter",
     url: "https://she.eva.cm/",
+  },
+  {
+    key: "cat",
+    label: "猫の恩返し · The Cat Returns",
+    url: "https://cat.eva.cm/",
   },
   {
     key: "star",
