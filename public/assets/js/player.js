@@ -1,5 +1,10 @@
 const NORMAL_PLAYBACK_RATE = 1;
-const STREAM_SOURCE = "./media/6c1f0b8e/41d7c9.m3u8";
+const videoElement = document.querySelector("#video");
+const streamSource = videoElement?.dataset.streamSource;
+
+if (!streamSource) {
+  throw new Error("The video element is missing data-stream-source.");
+}
 
 const player = videojs(
   "video",
@@ -13,7 +18,7 @@ const player = videojs(
     volume: 0.8,
     sources: [
       {
-        src: STREAM_SOURCE,
+        src: streamSource,
         type: "application/x-mpegURL",
       },
     ],

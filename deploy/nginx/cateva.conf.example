@@ -14,6 +14,15 @@ location = /index.html {
     try_files $uri =404;
 }
 
+# Full HTML pages selected by public/index.html.
+location /pages/ {
+    try_files $uri =404;
+
+    add_header Content-Disposition "inline" always;
+    add_header Cross-Origin-Resource-Policy "same-origin" always;
+    add_header X-Content-Type-Options "nosniff" always;
+}
+
 # Never expose an original MP4, even if one is copied here accidentally.
 location ~* \.mp4$ {
     return 404;

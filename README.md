@@ -8,6 +8,7 @@ web root: only `public/` is intended to be served by Nginx.
 ```text
 public/                    Browser-facing files and the Nginx document root
   index.html
+  pages/                   Shelter, Cat, and Star page documents
   assets/
     css/                   Page styles
     js/                    Player behaviour
@@ -30,19 +31,36 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory public
 
 Then open `http://127.0.0.1:8765/`.
 
+## Select the homepage
+
+`public/index.html` is the single homepage switch. Change only
+`ACTIVE_HOME_PAGE` to `shelter`, `cat`, or `star`:
+
+```js
+const ACTIVE_HOME_PAGE = "star";
+```
+
 ## Prepare the video stream
 
-The default command reads `private/video/cat.mp4` and writes the ignored HLS
-stream to `public/media/`:
+The default command reads all three MP4 files under `private/video/` and writes
+their ignored HLS streams to `public/media/`:
 
 ```sh
 ./scripts/prepare-video.sh
 ```
 
-An alternative source file and website root can be passed explicitly:
+Generate only one page's stream by passing its key:
 
 ```sh
-./scripts/prepare-video.sh /srv/cateva-source/cat.mp4 /var/www/cateva/public
+./scripts/prepare-video.sh shelter
+./scripts/prepare-video.sh cat
+./scripts/prepare-video.sh star
+```
+
+Alternative source and website roots can be passed explicitly:
+
+```sh
+./scripts/prepare-video.sh all /srv/cateva-source /var/www/cateva/public
 ```
 
 The script copies the existing H.264/AAC streams into fragmented MP4 HLS
