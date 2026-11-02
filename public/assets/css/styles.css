@@ -307,6 +307,35 @@ footer {
   text-align: center;
 }
 
+.site-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em 0.55em;
+}
+
+.site-switcher-link {
+  color: var(--accent);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+
+.site-switcher-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.site-switcher-link:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.site-switcher-current { color: inherit; }
+
+.site-switcher-separator { color: #bbb; }
+
 /* 768px 及以下使用移动端布局，并把背景焦点移到人物区域。 */
 @media (max-width: 768px) {
   .background {

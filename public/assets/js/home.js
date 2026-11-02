@@ -1,4 +1,21 @@
 const pageProfiles = new Set(["shelter", "cat", "star"]);
+const sites = Object.freeze([
+  {
+    key: "cat",
+    label: "猫の恩返し · The Cat Returns",
+    url: "https://cat.eva.cm/",
+  },
+  {
+    key: "shelter",
+    label: "避难所 · Shelter",
+    url: "https://she.eva.cm/",
+  },
+  {
+    key: "star",
+    label: "星之声 · ほしのこえ",
+    url: "https://star.eva.cm/",
+  },
+]);
 const activeHomePage = document.documentElement.dataset.homePage;
 const pageShell = document.querySelector("#pageShell");
 
@@ -27,6 +44,41 @@ function validatePageProfile(profile) {
   }
 }
 
+function renderSiteSwitcher(currentLabel) {
+  const siteSwitcher = document.querySelector("#siteSwitcher");
+  const currentSite = sites.find((site) => site.key === activeHomePage);
+  const linkedSites = sites.filter((site) => site.key !== activeHomePage);
+  if (!siteSwitcher || !currentSite || linkedSites.length !== 2) {
+    throw new Error("Unable to build the site switcher.");
+  }
+
+  const orderedSites = [linkedSites[0], currentSite, linkedSites[1]];
+  orderedSites.forEach((site, index) => {
+    if (index > 0) {
+      const separator = document.createElement("span");
+      separator.className = "site-switcher-separator";
+      separator.setAttribute("aria-hidden", "true");
+      separator.textContent = "/";
+      siteSwitcher.append(separator);
+    }
+
+    if (site.key === activeHomePage) {
+      const current = document.createElement("span");
+      current.className = "site-switcher-current";
+      current.setAttribute("aria-current", "page");
+      current.textContent = currentLabel;
+      siteSwitcher.append(current);
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.className = "site-switcher-link";
+    link.href = site.url;
+    link.textContent = site.label;
+    siteSwitcher.append(link);
+  });
+}
+
 async function loadHomePage() {
   if (!pageProfiles.has(activeHomePage)) {
     throw new Error(`Unknown home page: ${activeHomePage}`);
@@ -48,7 +100,7 @@ async function loadHomePage() {
   setText("#videoHeading", profile.videoHeading);
   setText("#reflectionTitle", profile.sectionTitle);
   setText("#pageDescription", profile.description);
-  setText("#pageFooter", profile.footer);
+  renderSiteSwitcher(profile.footer);
   videoElement.poster = profile.poster;
   videoElement.dataset.streamSource = profile.streamSource;
 
