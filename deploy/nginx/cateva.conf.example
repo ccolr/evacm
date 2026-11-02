@@ -1,64 +1,120 @@
-# Merge these directives into the site's existing HTTPS server block.
-# Preserve the real server_name, certificate, logging, and listen directives.
-
-root /var/www/cateva/public;
-index index.html;
-autoindex off;
-
-# The website entry remains directly accessible.
-location = / {
-    try_files /index.html =404;
+# 这个放在/etc/nginx/conf.d/sb.eva.cm.conf中
+# =========================================================
+# Cache lifetime by file type (used by "location /" below)
+# =========================================================
+map $uri $asset_expires {
+    default off;
+    ~*\.(css|js|webp|jpg|jpeg|png|gif|ico|svg|woff2)$ 30d;
 }
 
-location = /index.html {
-    return 302 /;
+# =========================================================
+# Public HTTP port 80:
+# ACME HTTP-01 validation, and redirect all other requests to https://sb.eva.cm
+# =========================================================
+server {
+    listen 80;
+    server_name sb.eva.cm;
+    root /home/otmno/www/evacm/public;
+
+    # acme.sh HTTP-01 challenge files; do not redirect
+    location ^~ /.well-known/acme-challenge/ {
+        try_files $uri =404;
+    }
+
+    location / {
+        return 301 https://sb.eva.cm$request_uri;
+    }
 }
 
-# Never expose an original MP4, even if one is copied here accidentally.
-location ~* \.mp4$ {
-    return 404;
-}
+# =========================================================
+# Local HTTPS on port 10443: the actual website
+# =========================================================
+server {
+    listen 127.0.0.1:10443 ssl;
+    server_name sb.eva.cm;
+    root /home/otmno/www/evacm/public;
+    index index.html;
+    autoindex off;
 
-# HLS playlist and fragmented media.
-location /media/ {
-    valid_referers server_names;
+    ssl_certificate     /etc/nginx/ssl/sb.eva.cm/fullchain.crt;
+    ssl_certificate_key /etc/nginx/ssl/sb.eva.cm/cert.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:eva_TLS:10m;
+    ssl_session_timeout 1h;
 
-    if ($invalid_referer) {
+    # Prevent Nginx's auto-generated redirects from exposing the internal port
+    port_in_redirect off;
+
+    # Reduce version disclosure; not a substitute for security updates
+    server_tokens off;
+
+    # Security headers: HSTS, nosniff, same-origin framing only, and
+    # sending only the origin on cross-site requests (less path leakage).
+    # Locations that define their own add_header must include this again.
+    include /etc/nginx/snippets/eva-headers.conf;
+
+    # Block hidden files, but keep the .well-known path
+    location ~ /\.(?!well-known(?:/|$)) {
         return 404;
     }
 
-    if ($http_sec_fetch_dest = document) {
+    # Never expose an original MP4, even if one is copied here accidentally
+    location ~* \.mp4$ {
         return 404;
     }
 
-    types {
-        application/vnd.apple.mpegurl m3u8;
-        video/mp4 m4s;
+    # The website entry remains directly accessible
+    location = / {
+        try_files /index.html =404;
     }
 
-    default_type application/octet-stream;
-    try_files $uri =404;
-
-    add_header Content-Disposition "inline" always;
-    add_header Cross-Origin-Resource-Policy "same-origin" always;
-    add_header X-Content-Type-Options "nosniff" always;
-}
-
-# Internal page profiles, CSS, JavaScript, images, icons, and vendor files.
-location / {
-    valid_referers server_names;
-
-    if ($invalid_referer) {
-        return 404;
+    # Use the full public URL so the internal port never appears in Location
+    location = /index.html {
+        return 302 https://sb.eva.cm/;
     }
 
-    if ($http_sec_fetch_dest = document) {
-        return 404;
+    # HLS playlist and fragmented media
+    location /media/ {
+        valid_referers server_names;
+
+        if ($invalid_referer) {
+            return 404;
+        }
+
+        if ($http_sec_fetch_dest = document) {
+            return 404;
+        }
+
+        types {
+            application/vnd.apple.mpegurl m3u8;
+            video/mp4 m4s;
+        }
+
+        default_type application/octet-stream;
+        try_files $uri =404;
+
+        include /etc/nginx/snippets/eva-headers.conf;
+        add_header Content-Disposition "inline" always;
+        add_header Cross-Origin-Resource-Policy "same-origin" always;
     }
 
-    try_files $uri =404;
+    # Internal page profiles, CSS, JavaScript, images, icons, and vendor files
+    location / {
+        valid_referers server_names;
 
-    add_header Content-Disposition "inline" always;
-    add_header Cross-Origin-Resource-Policy "same-origin" always;
-    add_header X-Content-Type-Options "nosniff" always;
+        if ($invalid_referer) {
+            return 404;
+        }
+
+        if ($http_sec_fetch_dest = document) {
+            return 404;
+        }
+
+        try_files $uri =404;
+        expires $asset_expires;
+
+        include /etc/nginx/snippets/eva-headers.conf;
+        add_header Content-Disposition "inline" always;
+        add_header Cross-Origin-Resource-Policy "same-origin" always;
+    }
 }
