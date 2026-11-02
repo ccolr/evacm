@@ -77,15 +77,56 @@ function showPageShell() {
   pageShell.removeAttribute("aria-busy");
 }
 
-function updatePlayerAspectRatio() {
-  const mediaElement = player.el().querySelector("video");
-  if (!mediaElement?.videoWidth || !mediaElement.videoHeight) return;
+function setPlayerAspectRatio(width, height) {
+  if (
+    !Number.isFinite(width)
+    || width <= 0
+    || !Number.isFinite(height)
+    || height <= 0
+  ) return false;
 
   playerWrap.style.setProperty(
     "--video-aspect-ratio",
-    `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`,
+    `${width} / ${height}`,
   );
   showPageShell();
+  return true;
+}
+
+function updatePlayerAspectRatio() {
+  const mediaElement = player.el().querySelector("video");
+  if (!mediaElement) return false;
+
+  return setPlayerAspectRatio(
+    mediaElement.videoWidth,
+    mediaElement.videoHeight,
+  );
+}
+
+let posterAspectRatioLoading = false;
+
+function resolvePlayerAspectRatio() {
+  if (updatePlayerAspectRatio() || posterAspectRatioLoading) return;
+
+  const mediaElement = player.el().querySelector("video");
+  if (!mediaElement?.poster) return;
+
+  // Safari may not expose HLS dimensions until playback starts. The poster uses
+  // the same canvas as its video, so it can establish the layout without a jump.
+  posterAspectRatioLoading = true;
+  const posterImage = new Image();
+
+  posterImage.addEventListener("load", () => {
+    posterAspectRatioLoading = false;
+    if (updatePlayerAspectRatio()) return;
+    setPlayerAspectRatio(posterImage.naturalWidth, posterImage.naturalHeight);
+  }, { once: true });
+
+  posterImage.addEventListener("error", () => {
+    posterAspectRatioLoading = false;
+  }, { once: true });
+
+  posterImage.src = mediaElement.poster;
 }
 
 function enforceNormalPlaybackRate() {
@@ -251,6 +292,7 @@ function installDeferredSeeking() {
 player.ready(() => {
   restrictMediaElement();
   installDeferredSeeking();
+  resolvePlayerAspectRatio();
 });
 
 const updatePeekOffset = () => {
@@ -292,8 +334,9 @@ window.addEventListener("resize", () => {
 
 player.on("loadedmetadata", () => {
   enforceNormalPlaybackRate();
-  updatePlayerAspectRatio();
+  resolvePlayerAspectRatio();
 });
+player.on("loadeddata", updatePlayerAspectRatio);
 player.on("loadstart", restrictMediaElement);
 player.on("error", showPageShell);
 player.on("ratechange", enforceNormalPlaybackRate);

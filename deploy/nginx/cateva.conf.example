@@ -4,7 +4,7 @@
 # =========================================================
 map $uri $asset_expires {
     default off;
-    ~*\.(css|js|webp|jpg|jpeg|png|gif|ico|svg|woff2)$ 30d;
+    ~*\.(css|js|webp|jpg|jpeg|png|gif|ico|svg|woff2)$ 7d;
 }
 
 # =========================================================
