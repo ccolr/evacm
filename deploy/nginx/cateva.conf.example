@@ -13,6 +13,7 @@ map $uri $asset_expires {
 # =========================================================
 server {
     listen 80;
+    listen [::]:80;
     server_name sb.eva.cm;
     root /home/otmno/www/evacm/public;
 
@@ -31,6 +32,7 @@ server {
 # =========================================================
 server {
     listen 127.0.0.1:10443 ssl;
+    listen [::1]:10443 ssl;
     server_name sb.eva.cm;
     root /home/otmno/www/evacm/public;
     index index.html;
