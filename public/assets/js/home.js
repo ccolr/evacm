@@ -92,6 +92,8 @@ function renderSiteSwitcher(currentLabel) {
     const link = document.createElement("a");
     link.className = "site-switcher-link";
     link.href = site.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
     link.textContent = site.label;
     siteSwitcher.append(link);
   });
