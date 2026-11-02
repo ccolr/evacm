@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#191927" />
     <title>ほしのこえ|EVA.CM</title>
-    <link rel="icon" href="./favicon.ico" sizes="32x32" />
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./vendor/video-js.min.css" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="./assets/icons/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./assets/vendor/videojs/video-js.min.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
 
 <body>
@@ -29,8 +29,8 @@
         <section class="player-card" aria-label="视频播放器">
             <div class="player" id="playerWrap">
                 <video id="video" class="video-js vjs-big-play-centered" controls preload="metadata" playsinline
-                    poster="./cover.png">
-                    <source src="./cat.mp4" type="video/mp4" />
+                    controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback
+                    draggable="false" poster="./assets/images/cover.png">
                     你的浏览器暂不支持 HTML5 视频播放。
                 </video>
                 <div class="video-heading" aria-hidden="true">
@@ -49,8 +49,8 @@
         <footer>星之声 · ほしのこえ</footer>
     </main>
 
-    <script src="./vendor/video.min.js"></script>
-    <script src="./player.js"></script>
+    <script src="./assets/vendor/videojs/video.min.js"></script>
+    <script src="./assets/js/player.js"></script>
 </body>
 
 </html>

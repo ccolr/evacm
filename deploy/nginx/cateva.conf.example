@@ -1,0 +1,64 @@
+# Merge these directives into the site's existing HTTPS server block.
+# Preserve the real server_name, certificate, logging, and listen directives.
+
+root /var/www/cateva/public;
+index index.html;
+autoindex off;
+
+# The website entry remains directly accessible.
+location = / {
+    try_files /index.html =404;
+}
+
+location = /index.html {
+    try_files $uri =404;
+}
+
+# Never expose an original MP4, even if one is copied here accidentally.
+location ~* \.mp4$ {
+    return 404;
+}
+
+# HLS playlist and fragmented media.
+location /media/ {
+    valid_referers server_names;
+
+    if ($invalid_referer) {
+        return 404;
+    }
+
+    if ($http_sec_fetch_dest = document) {
+        return 404;
+    }
+
+    types {
+        application/vnd.apple.mpegurl m3u8;
+        video/mp4 m4s;
+    }
+
+    default_type application/octet-stream;
+    try_files $uri =404;
+
+    add_header Content-Disposition "inline" always;
+    add_header Cross-Origin-Resource-Policy "same-origin" always;
+    add_header X-Content-Type-Options "nosniff" always;
+}
+
+# CSS, JavaScript, images, icons, and vendor files.
+location / {
+    valid_referers server_names;
+
+    if ($invalid_referer) {
+        return 404;
+    }
+
+    if ($http_sec_fetch_dest = document) {
+        return 404;
+    }
+
+    try_files $uri =404;
+
+    add_header Content-Disposition "inline" always;
+    add_header Cross-Origin-Resource-Policy "same-origin" always;
+    add_header X-Content-Type-Options "nosniff" always;
+}

@@ -28,11 +28,12 @@ body {
   z-index: -1;
   inset: 0;
   background-color: #d8c6c2;
-  background-image: url("./bg.jpg");
+  background-image: url("../images/background.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 2160px 1296px;
   pointer-events: none;
+  -webkit-touch-callout: none;
 }
 
 .page-shell {
@@ -142,6 +143,9 @@ h1 {
   color: #fff;
   background: #080808;
   font-family: Arial, sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .video-js .vjs-tech {

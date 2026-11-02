@@ -1,4 +1,5 @@
 const NORMAL_PLAYBACK_RATE = 1;
+const STREAM_SOURCE = "./media/6c1f0b8e/41d7c9.m3u8";
 
 const player = videojs(
   "video",
@@ -10,6 +11,12 @@ const player = videojs(
     enableSmoothSeeking: true,
     disableSeekWhileScrubbingOnMobile: true,
     volume: 0.8,
+    sources: [
+      {
+        src: STREAM_SOURCE,
+        type: "application/x-mpegURL",
+      },
+    ],
     controlBar: {
       children: [
         "playToggle",
@@ -34,6 +41,31 @@ const player = videojs(
 const playerWrap = document.querySelector("#playerWrap");
 const pageShell = document.querySelector(".page-shell");
 const peekToggle = document.querySelector("#peekToggle");
+
+function preventExtractionGesture(event) {
+  event.preventDefault();
+}
+
+function restrictMediaElement() {
+  const mediaElement = player.el().querySelector("video");
+  if (!mediaElement) return;
+
+  mediaElement.controlsList?.add("nodownload", "noremoteplayback");
+  mediaElement.disablePictureInPicture = true;
+  mediaElement.disableRemotePlayback = true;
+  mediaElement.draggable = false;
+}
+
+player.el().addEventListener("contextmenu", preventExtractionGesture);
+player.el().addEventListener("dragstart", preventExtractionGesture);
+
+document.addEventListener("contextmenu", (event) => {
+  if (!(event.target instanceof Element)) return;
+
+  const isVideo = Boolean(event.target.closest(".video-js"));
+  const isPageBackground = !event.target.closest(".page-shell");
+  if (isVideo || isPageBackground) preventExtractionGesture(event);
+});
 
 function showPageShell() {
   pageShell.classList.remove("is-metadata-pending");
@@ -211,7 +243,10 @@ function installDeferredSeeking() {
   }, { capture: true, passive: false });
 }
 
-player.ready(installDeferredSeeking);
+player.ready(() => {
+  restrictMediaElement();
+  installDeferredSeeking();
+});
 
 const updatePeekOffset = () => {
   const currentOffset = pageShell.classList.contains("is-peeking")
@@ -254,6 +289,7 @@ player.on("loadedmetadata", () => {
   enforceNormalPlaybackRate();
   updatePlayerAspectRatio();
 });
+player.on("loadstart", restrictMediaElement);
 player.on("error", showPageShell);
 player.on("ratechange", enforceNormalPlaybackRate);
 player.on("play", () => {
