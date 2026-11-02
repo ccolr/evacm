@@ -11,16 +11,7 @@ location = / {
 }
 
 location = /index.html {
-    try_files $uri =404;
-}
-
-# Full HTML pages selected by public/index.html.
-location /pages/ {
-    try_files $uri =404;
-
-    add_header Content-Disposition "inline" always;
-    add_header Cross-Origin-Resource-Policy "same-origin" always;
-    add_header X-Content-Type-Options "nosniff" always;
+    return 302 /;
 }
 
 # Never expose an original MP4, even if one is copied here accidentally.
@@ -53,7 +44,7 @@ location /media/ {
     add_header X-Content-Type-Options "nosniff" always;
 }
 
-# CSS, JavaScript, images, icons, and vendor files.
+# Internal page profiles, CSS, JavaScript, images, icons, and vendor files.
 location / {
     valid_referers server_names;
 

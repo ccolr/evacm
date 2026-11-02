@@ -8,7 +8,7 @@ web root: only `public/` is intended to be served by Nginx.
 ```text
 public/                    Browser-facing files and the Nginx document root
   index.html
-  pages/                   Shelter, Cat, and Star page documents
+  content/                 Internal Shelter, Cat, and Star page profiles
   assets/
     css/                   Page styles
     js/                    Player behaviour
@@ -37,8 +37,15 @@ Then open `http://127.0.0.1:8765/`.
 `ACTIVE_HOME_PAGE` to `shelter`, `cat`, or `star`:
 
 ```js
-const ACTIVE_HOME_PAGE = "star";
+const ACTIVE_HOME_PAGE = "shelter";
 ```
+
+The selected profile is filled into the root page without navigation, so the
+browser URL remains `/`. The other profiles are not requested, and the Nginx
+resource guard rejects direct browser navigation to `public/content/`.
+
+On each VPS, generate and deploy only the stream matching this key when the
+other videos should not exist on that server.
 
 ## Prepare the video stream
 

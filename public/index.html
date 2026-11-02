@@ -8,28 +8,53 @@
     <title>EVA.CM</title>
     <link rel="icon" href="./assets/icons/favicon.ico" sizes="32x32" />
     <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml" />
-    <script>
-        // 只需修改这一行：shelter、cat 或 star。
-        const ACTIVE_HOME_PAGE = "shelter";
-
-        const homePages = Object.freeze({
-            shelter: "./pages/shelter.html",
-            cat: "./pages/cat.html",
-            star: "./pages/star.html",
-        });
-        const homePage = homePages[ACTIVE_HOME_PAGE];
-
-        if (!homePage) {
-            throw new Error(`Unknown home page: ${ACTIVE_HOME_PAGE}`);
-        }
-
-        window.location.replace(homePage);
-    </script>
+    <link rel="stylesheet" href="./assets/vendor/videojs/video-js.min.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
 
 <body>
-    <p>正在加载首页……</p>
-    <noscript>请启用 JavaScript 以加载首页。</noscript>
+    <div class="background" aria-hidden="true"></div>
+
+    <main class="page-shell is-metadata-pending" id="pageShell" aria-busy="true">
+        <header class="page-header">
+            <h1 id="pageTitle"></h1>
+            <button class="peek-toggle" id="peekToggle" type="button" aria-pressed="false"
+                aria-label="下移卡片以查看背景" title="查看背景">
+                <svg class="peek-toggle-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M8 1 4.25 4.75h2.5v6.5h-2.5L8 15l3.75-3.75h-2.5v-6.5h2.5L8 1Z" />
+                </svg>
+            </button>
+        </header>
+
+        <section class="player-card" aria-label="视频播放器">
+            <div class="player" id="playerWrap">
+                <video id="video" class="video-js vjs-big-play-centered" controls preload="metadata" playsinline
+                    controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback
+                    draggable="false">
+                    你的浏览器暂不支持 HTML5 视频播放。
+                </video>
+                <div class="video-heading" aria-hidden="true">
+                    <span class="episode-mark">MOVIE</span>
+                    <span id="videoHeading"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="reflection" aria-labelledby="reflectionTitle">
+            <h2 id="reflectionTitle"></h2>
+            <p class="reflection-placeholder" id="pageDescription"></p>
+        </section>
+
+        <footer id="pageFooter"></footer>
+    </main>
+
+    <script src="./assets/vendor/videojs/video.min.js"></script>
+    <script>
+      // 每台 VPS 只需修改这一行：shelter、cat 或 star。
+      const ACTIVE_HOME_PAGE = "shelter";
+      document.documentElement.dataset.homePage = ACTIVE_HOME_PAGE;
+    </script>
+    <script type="module" src="./assets/js/home.js"></script>
 </body>
 
 </html>
