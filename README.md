@@ -31,18 +31,21 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory public
 
 Then open `http://127.0.0.1:8765/`.
 
-## Select the homepage
+## Homepage selection
 
-`public/index.html` is the single homepage switch. Change only
-`ACTIVE_HOME_PAGE` to `shelter`, `cat`, or `star`:
+The homepage is selected automatically from the production hostname:
 
-```js
-const ACTIVE_HOME_PAGE = "shelter";
+```text
+she.eva.cm   -> shelter
+cat.eva.cm   -> cat
+star.eva.cm  -> star
 ```
 
 The selected profile is filled into the root page without navigation, so the
-browser URL remains `/`. The other profiles are not requested, and the Nginx
-resource guard rejects direct browser navigation to `public/content/`.
+browser URL remains `/`. Production query parameters cannot switch the page.
+For local previews only, use `http://127.0.0.1:8765/?page=cat` with `shelter`,
+`cat`, or `star`. The Nginx resource guard rejects direct browser navigation
+to `public/content/`.
 
 On each VPS, generate and deploy only the stream matching this key when the
 other videos should not exist on that server.

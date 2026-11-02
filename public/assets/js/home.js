@@ -1,4 +1,10 @@
 const pageProfiles = new Set(["shelter", "cat", "star"]);
+const pageByHostname = Object.freeze({
+  "she.eva.cm": "shelter",
+  "cat.eva.cm": "cat",
+  "star.eva.cm": "star",
+});
+const localHostnames = new Set(["127.0.0.1", "localhost"]);
 const sites = Object.freeze([
   {
     key: "cat",
@@ -16,10 +22,22 @@ const sites = Object.freeze([
     url: "https://star.eva.cm/",
   },
 ]);
-const activeHomePage = document.documentElement.dataset.homePage;
 const pageShell = document.querySelector("#pageShell");
 
-delete document.documentElement.dataset.homePage;
+function resolveActiveHomePage() {
+  const hostname = window.location.hostname.toLowerCase();
+  const productionPage = pageByHostname[hostname];
+  if (productionPage) return productionPage;
+
+  if (localHostnames.has(hostname)) {
+    const previewPage = new URLSearchParams(window.location.search).get("page");
+    return pageProfiles.has(previewPage) ? previewPage : "shelter";
+  }
+
+  throw new Error(`Unsupported hostname: ${hostname}`);
+}
+
+const activeHomePage = resolveActiveHomePage();
 
 function setText(selector, value) {
   const element = document.querySelector(selector);
